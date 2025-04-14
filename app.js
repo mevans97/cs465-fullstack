@@ -10,6 +10,7 @@ var travelRouter = require('./app_server/routes/travel');
 var apiRouter = require('./app_api/routes/index');
 
 var handlebars = require('hbs');
+const { type } = require('os');
 
 //Bring in the database
 require('./app_api/models/db');
@@ -30,6 +31,22 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+//Enable CORS ( Allows external api calls, connected angular SPA to express database
+app.use('/api', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-TypeError,Content-Type, Accept');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+
+  // Respond to preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
+
+// wire up routes to controllers
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/travel', travelRouter);
